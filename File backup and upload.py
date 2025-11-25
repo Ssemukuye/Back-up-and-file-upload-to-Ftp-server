@@ -7,17 +7,17 @@ from cryptography.fernet import Fernet
 warnings.filterwarnings('ignore','.*Failed to load HostKeys.*')
 import time
 
-# set the computer name / code
-computer = 'cpu10'
+# set the computer name / code for each machine
+computer = 'cpu10'   
 
 # timestamp for naming the backup file
 timestamp = time.strftime("%Y_%m_%d-%H-%M-%S")
 
-# build the backup filename
-file_name = f"tablet10_{timestamp}"
+# create the backup file including the computer name and timestamp
+file_name = f"{computer}_{timestamp}"
 
-# remote directory on the FTP server
-remote_dir = '/MICD 2025-08-28 03;20;48'
+# remote directory on the FTP server for each computer subfolder
+remote_dir = f"/TES/{computer}"
 
 # FTP server login details (password is decrypted later)
 HostName = '0f7a55b.netsolhost.com'
@@ -36,6 +36,7 @@ with open(r"C:\Users\TIMO\Documents\Tess back up\ftp_pwd.txt", "rb") as f:
 # decrypt the FTP password
 password = box.decrypt(encrypted).decode()
 
+print("Decrypted password:", password)
 
 # local folder to back up
 folder_path = r"C:\micdrop\MSAccessDatabase"
@@ -65,6 +66,7 @@ latest_file = sorted(list_of_files, key=os.path.getctime)[-1]
 
 # upload the latest backup to the FTP server
 with pysftp.Connection(host=HostName, username=UserName, password=password, cnopts=cnopts) as ftp:
+    # navigate to the per-computer folder
     with ftp.cd(remote_dir):
         ftp.put(latest_file)
 
